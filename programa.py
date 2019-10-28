@@ -44,6 +44,25 @@ def indf_logico(palabra):
   else:
     return False
 
+# indentificador agrupacion
+def indf_agrupacion(palabra):
+  if(palabra == '('):
+    return True
+  elif(palabra == ')'):
+    return True
+  elif(palabra == '{'):
+    return True
+  elif(palabra == '}'):
+    return True
+  elif(palabra == '['):
+    return True
+  elif(palabra == '"'):
+    return True
+  elif(palabra == "'"):
+    return True
+  else:
+    return False
+
 # identificador numero
 def indf_numero(palabra):
   try:
@@ -60,15 +79,17 @@ def indf_general(palabra):
     return 'comparacion'
   elif(indf_logico(palabra)): # puede tener 1 o 2 caracteres (casi terminado)
     return 'logico'
-  elif(indf_numero(palabra)): # puede ser n caracteres (progreso) #
+  elif(indf_numero(palabra)): # puede ser n caracteres (terminado)
     return 'numero'
+  elif(indf_agrupacion(palabra)): # debe ser de un caractere (terminado)
+    return 'agrupacion'
   elif(palabra == ' '): # debe ser de 1 caracter (terminado)
     return 'espacio'
   elif(palabra == ';'): # debe ser de 1 caracter (terminado)
     return 'separador'
-  elif(palabra == ''): # valores invalidos (terminado) #
+  elif(palabra == ''): # valores invalidos (terminado)
     return 'vacio'
-  else: # puede ser n caracteres (progreso)
+  else: # puede ser n caracteres (terminado)
     return 'palabra'
 
 
@@ -81,6 +102,7 @@ while(True):
   list_aritmeticos = []
   list_comparacion = []
   list_logicos = []
+  list_agrupacion = []
   list_numeros = []
   list_palabras = []
   no_espacios = 0
@@ -205,6 +227,21 @@ while(True):
         
         reg_palabra = '' + respaldo
     
+    # ---------------------------------------------- agrupacion seccion (terminado)
+    if((indf_general(letra) == 'agrupacion') and estado_palabra != 'total'):
+      list_agrupacion.append(letra)
+
+      reg_palabra = reg_palabra[:-1]
+
+      # asignar separacion
+      if(indf_general(reg_palabra) == 'numero'):
+        list_numeros.append(reg_palabra)
+      elif (indf_general(reg_palabra) == 'palabra'):
+        list_palabras.append(reg_palabra)
+      
+      estado_palabra = 'total'
+      reg_palabra = ''
+
     # ---------------------------------------------- espacio seccion (terminado)
     if((indf_general(letra) == 'espacio') and estado_palabra != 'total'):
       no_espacios = no_espacios + 1
@@ -264,6 +301,12 @@ while(True):
     print('')
     print('Logicos')
     for item in list_logicos:
+      print(item)
+  
+  if(len(list_agrupacion) > 0):
+    print('')
+    print('Agrupacion')
+    for item in list_agrupacion:
       print(item)
   
   if(len(list_numeros) > 0):
