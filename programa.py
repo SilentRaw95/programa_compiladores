@@ -63,6 +63,27 @@ def indf_agrupacion(palabra):
   else:
     return False
 
+# indentificador reservadas
+def indf_reservadas(palabra):
+  if(palabra == 'print'):
+    return True
+  elif(palabra == 'write'):
+    return True
+  elif(palabra == 'while'):
+    return True
+  elif(palabra == 'for'):
+    return True
+  elif(palabra == 'string'):
+    return True
+  elif(palabra == 'int'):
+    return True
+  elif(palabra == 'float'):
+    return True
+  elif(palabra == 'char'):
+    return True
+  else:
+    return False
+
 # identificador numero
 def indf_numero(palabra):
   try:
@@ -83,6 +104,8 @@ def indf_general(palabra):
     return 'numero'
   elif(indf_agrupacion(palabra)): # debe ser de un caractere (terminado)
     return 'agrupacion'
+  elif(indf_reservadas(palabra)): # puede ser n caracteres (terminado)
+    return 'reservada'
   elif(palabra == ' '): # debe ser de 1 caracter (terminado)
     return 'espacio'
   elif(palabra == ';'): # debe ser de 1 caracter (terminado)
@@ -103,6 +126,7 @@ while(True):
   list_comparacion = []
   list_logicos = []
   list_agrupacion = []
+  list_reservadas = []
   list_numeros = []
   list_palabras = []
   no_espacios = 0
@@ -242,6 +266,12 @@ while(True):
       estado_palabra = 'total'
       reg_palabra = ''
 
+    # ---------------------------------------------- reservadas seccion (terminado)
+    if((indf_general(reg_palabra) == 'reservada') and estado_palabra != 'total'):
+      list_reservadas.append(reg_palabra)
+      reg_palabra = ''
+      estado_palabra = 'total'
+
     # ---------------------------------------------- espacio seccion (terminado)
     if((indf_general(letra) == 'espacio') and estado_palabra != 'total'):
       no_espacios = no_espacios + 1
@@ -309,6 +339,12 @@ while(True):
     for item in list_agrupacion:
       print(item)
   
+  if(len(list_reservadas) > 0):
+    print('')
+    print('Reservadas')
+    for item in list_reservadas:
+      print(item)
+
   if(len(list_numeros) > 0):
     print('')
     print('Numeros')
