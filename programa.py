@@ -116,12 +116,12 @@ def indf_general(palabra):
     return 'palabra'
 
 
-
 # programa
 while(True):
   oracion = raw_input("Ingresa una sentencia: ")
 
   # variables acumuladores, registros
+  # listados de simbolos, operadores, y otros
   list_aritmeticos = []
   list_comparacion = []
   list_logicos = []
@@ -129,14 +129,28 @@ while(True):
   list_reservadas = []
   list_numeros = []
   list_palabras = []
+
+  # listado de tipos de datos
+  list_string = []
+  list_int = []
+  list_char = []
+  list_float = []
+
+  # contadores
   no_espacios = 0
   no_separadores = 0
 
+  # registros
   reg_palabra = ''
   reg_aritmetico = ''
   reg_comparacion = ''
   reg_logico = ''
+  reg_tipodato = ''
+  reg_infdato = ''
+  reg_valuedato = 'null'
 
+  #estados
+  estado_dato = '0'
   estado_palabra = ''
 
   long_oracion = len(oracion)
@@ -216,7 +230,7 @@ while(True):
         
         reg_palabra = '' + respaldo
     
-    # ---------------------------------------------- logico seccion (progreso)
+    # ---------------------------------------------- logico seccion (terminada)
     if((indf_general(letra) == 'logico' or len(reg_logico) > 0 or letra == '&' or letra == '|') and estado_palabra != 'total'):
       reg_logico = reg_logico + letra
 
@@ -251,7 +265,7 @@ while(True):
         
         reg_palabra = '' + respaldo
     
-    # ---------------------------------------------- agrupacion seccion (terminado)
+    # ---------------------------------------------- agrupacion seccion (terminada)
     if((indf_general(letra) == 'agrupacion') and estado_palabra != 'total'):
       list_agrupacion.append(letra)
 
@@ -266,13 +280,43 @@ while(True):
       estado_palabra = 'total'
       reg_palabra = ''
 
-    # ---------------------------------------------- reservadas seccion (terminado)
+    # ---------------------------------------------- reservadas seccion (terminada)
     if((indf_general(reg_palabra) == 'reservada') and estado_palabra != 'total'):
       list_reservadas.append(reg_palabra)
+
+      if(reg_palabra == 'string'):
+        reg_tipodato = reg_palabra
+        estado_dato = '1'
+      elif(reg_palabra == 'int'):
+        reg_tipodato = reg_palabra
+        estado_dato = '1'
+      elif(reg_palabra == 'float'):
+        reg_tipodato = reg_palabra
+        estado_dato = '1'
+      elif(reg_palabra == 'char'):
+        reg_tipodato = reg_palabra
+        estado_dato = '1'
+
       reg_palabra = ''
       estado_palabra = 'total'
+    
+    # ---------------------------------------------- tipodato seccion (terminada)
+    if(reg_tipodato and estado_dato == '1'):
+      if(letra == "="):
+        if(reg_infdato):
+          estado_dato = '2'
+        else:
+          estado_dato = '2'
+          reg_palabra = reg_palabra[:-1]
+          
+          if (indf_general(reg_palabra) == 'palabra'):
+            list_palabras.append(reg_palabra)
+            reg_infdato = reg_palabra
 
-    # ---------------------------------------------- espacio seccion (terminado)
+      if(letra == ";"):
+        estado_dato = '0'
+
+    # ---------------------------------------------- espacio seccion (terminada)
     if((indf_general(letra) == 'espacio') and estado_palabra != 'total'):
       no_espacios = no_espacios + 1
 
@@ -284,10 +328,14 @@ while(True):
       elif (indf_general(reg_palabra) == 'palabra'):
         list_palabras.append(reg_palabra)
       
+      # tipos de datos
+      if(estado_dato == '1' and (not indf_general(reg_palabra) == 'vacio' or not indf_general(reg_palabra) == 'espacio')):
+        reg_infdato = reg_palabra
+      
       estado_palabra = 'total'
       reg_palabra = ''
 
-    # ---------------------------------------------- separador seccion (terminado)
+    # ---------------------------------------------- separador seccion (terminada)
     if((indf_general(letra) == 'separador') and estado_palabra != 'total'):
       no_separadores = no_separadores + 1
 
@@ -298,12 +346,23 @@ while(True):
         list_numeros.append(reg_palabra)
       elif (indf_general(reg_palabra) == 'palabra'):
         list_palabras.append(reg_palabra)
-      
+
+      # tipos de datos
+      if(estado_dato == '2'):
+        if(reg_tipodato == 'string'):
+          list_string.append(reg_infdato+" = "+reg_palabra)
+        elif(reg_tipodato == 'int'):
+          list_int.append(reg_infdato+" = "+reg_palabra)
+        elif(reg_tipodato == 'float'):
+          list_float.append(reg_infdato+" = "+reg_palabra)
+        elif(reg_tipodato == 'char'):
+          list_char.append(reg_infdato+" = "+reg_palabra)
+
       estado_palabra = 'total'
       reg_palabra = ''
       
   #cuando se acaba la iteracion
-  if(len(reg_aritmetico) > 0):
+  if(len(reg_aritmetico) > 0 and (not reg_aritmetico == "=")):
     list_aritmeticos.append(reg_aritmetico)
   elif(len(reg_comparacion) > 0):
     list_comparacion.append(reg_comparacion)
@@ -364,6 +423,31 @@ while(True):
   if(no_separadores > 0):
     print('')
     print('No. de (;): '+str(no_separadores))
+  
+  # mostrar listado tipos de datos
+  if(len(list_float) > 0):
+    print('')
+    print('Float')
+    for item in list_float:
+      print(item)
+  
+  if(len(list_char) > 0):
+    print('')
+    print('Char')
+    for item in list_char:
+      print(item)
+  
+  if(len(list_int) > 0):
+    print('')
+    print('Int')
+    for item in list_int:
+      print(item)
+  
+  if(len(list_string) > 0):
+    print('')
+    print('String')
+    for item in list_string:
+      print(item)
   
   print('')
     
