@@ -201,34 +201,41 @@ while(True):
 
       if(len(reg_comparacion) == 2):
         # obtener aritmeticos
+        validacion = False
+
         if(indf_general(reg_comparacion) == 'comparacion'):
-          list_aritmeticos.append(reg_comparacion)
+          list_comparacion.append(reg_comparacion)
           estado_palabra = 'total'
-        else:
-          list_aritmeticos.append(reg_comparacion[0])
+          validacion = True
+        elif(indf_general(reg_comparacion[0]) == 'comparacion'):
+          list_comparacion.append(reg_comparacion[0])
           estado_palabra = 'parcial'
+          validacion = True
         
         # separar palabra
-        respaldo = ''
-        reg_palabra = reg_palabra[:-2]
-        
-        if(estado_palabra == 'total'):
-          reg_comparacion = ''
-        else:
-          if(indf_general(reg_comparacion[1]) == 'comparacion'):
-            respaldo = reg_comparacion[1]
-            reg_comparacion = reg_comparacion[1]
-          else:
-            respaldo = reg_comparacion[1]
+        if(validacion):
+          respaldo = ''
+          reg_palabra = reg_palabra[:-2]
+          
+          if(estado_palabra == 'total'):
             reg_comparacion = ''
-        
-        # asignar separacion
-        if(indf_general(reg_palabra) == 'numero'):
-          list_numeros.append(reg_palabra)
-        elif (indf_general(reg_palabra) == 'palabra'):
-          list_palabras.append(reg_palabra)
-        
-        reg_palabra = '' + respaldo
+          else:
+            if(indf_general(reg_comparacion[1]) == 'comparacion'):
+              respaldo = reg_comparacion[1]
+              reg_comparacion = reg_comparacion[1]
+            else:
+              respaldo = reg_comparacion[1]
+              reg_comparacion = ''
+          
+          # asignar separacion
+          if(indf_general(reg_palabra) == 'numero'):
+            list_numeros.append(reg_palabra)
+          elif (indf_general(reg_palabra) == 'palabra'):
+            list_palabras.append(reg_palabra)
+          
+          reg_palabra = '' + respaldo
+        else:
+          reg_comparacion = ''
     
     # ---------------------------------------------- logico seccion (terminada)
     if((indf_general(letra) == 'logico' or len(reg_logico) > 0 or letra == '&' or letra == '|') and estado_palabra != 'total'):
